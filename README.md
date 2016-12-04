@@ -10,7 +10,7 @@ Adds new ores and ore processing, and also machines, some of which use electrici
 
 Aims to also add some cool modern physics-related machinery like particle accelerators, nuclear reactors and more!
 
-And, of course, your good old coal generator, solar panels and stuff like that ^_^
+And, of course, your good old coal generator, solar panels and stuff like that
 
 This mod uses Minecraft Forge and RedstoneFlux API
 
@@ -27,7 +27,7 @@ Ore processing things like the grinder, crusher, etc
 
 Fission reactors and Fissile Fuel Processing
 
-Some form of steam maybe, depending on how i go about doing the reactors :P
+Some form of steam maybe, depending on how i go about doing the reactors
 
 Fusion reactors: Tokamak Reactor, Inertial Confinement Reactor, etc
 
@@ -35,4 +35,4 @@ Particle Accelerators and Particle Colliders
 
 In terms of resources: Antimatter, Strange Matter, Exotic Matter, Lead (and later mabe more stuff)
 
-And much much more that i have planned :D
+And much much more that i have planned!
