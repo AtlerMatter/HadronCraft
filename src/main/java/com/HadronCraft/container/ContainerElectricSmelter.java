@@ -14,6 +14,7 @@ public class ContainerElectricSmelter extends Container{
 	
 	private TileElectricSmelter entity;
 	public int lastEnergy;
+	public int lastSmeltTime;
 	public int lastCycledTicks;
 	
 	public ContainerElectricSmelter (InventoryPlayer playerInv, TileElectricSmelter entity) {
@@ -37,7 +38,36 @@ public class ContainerElectricSmelter extends Container{
 	
 	public void addCraftingToCrafters(ICrafting icrafting){
 		super.addCraftingToCrafters(icrafting);
+       		icrafting.sendProgressBarUpdate(this, 0, this.entity.smeltTime);
+       		icrafting.sendProgressBarUpdate(this, 1, this.entity.currentSmeltTime);
 	}
+	
+	public void detectAndSendChanges(){
+		super.detectAndSendChanges();
+		
+		for (int i = 0; i < this.crafters.size(); i++){
+			ICrafting icrafting = (ICrafting) this.crafters.get(i);
+			
+			icrafting.sendProgressBarUpdate(this, 1, this.entity.energy);
+			icrafting.sendProgressBarUpdate(this, 2, this.entity.currentSmeltTime);
+			icrafting.sendProgressBarUpdate(this, 3, this.entity.smeltTime);
+			
+			icrafting.sendProgressBarUpdate(this, 4, this.entity.energy >> 16);
+			icrafting.sendProgressBarUpdate(this, 5, this.entity.currentSmeltTime >> 16);
+			icrafting.sendProgressBarUpdate(this, 6, this.entity.smeltTime >> 16);
+		}
+	}
+		
+	public void updateProgressBar(int slot, int value){
+		super.updateProgressBar(slot, value);
+		if (slot == 1){this.lastEnergy = this.upcastShort(value);}
+		if (slot == 2){this.lastSmeltTime = this.upcastShort(value);}
+		// TODO if (slot == 3){this.
+		
+		if (slot == 3){this.entity.energy = this.lastEnergy | value << 16;}
+		if (slot == 4){this.entity.smeltTime = this.lastSmeltTime | value << 16;}
+	}
+
 	
 	public ItemStack transferStackInSlot(EntityPlayer player, int clickedSlotNumber){
 		ItemStack itemstack = null;
@@ -75,6 +105,11 @@ public class ContainerElectricSmelter extends Container{
 			slot.onPickupFromSlot(player, itemstack1);
 		}
 		return itemstack;
+	}
+	
+	public int upcastShort(int input){
+		if (input < 0) input += 65536;
+		return input;
 	}
 
 	@Override
