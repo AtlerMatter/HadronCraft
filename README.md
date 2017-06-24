@@ -29,7 +29,7 @@ Fission reactors and Fissile Fuel Processing
 
 Some form of steam maybe, depending on how i go about doing the reactors
 
-Fusion reactors: Tokamak Reactor, Inertial Confinement Reactor, etc
+Fusion reactors: Magnetic Confinement Reactor, Inertial Confinement Reactor, etc
 
 Particle Accelerators and Particle Colliders
 
