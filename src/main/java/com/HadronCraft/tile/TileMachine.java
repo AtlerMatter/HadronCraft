@@ -4,6 +4,7 @@ import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyProvider;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -15,7 +16,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileMachine extends TileEntity implements IEnergyHandler, IEnergyConnection, IInventory{
+public abstract class TileMachine extends TileEntity implements IEnergyReceiver, IInventory{
 	public boolean flag;
 	public boolean flag1 = false;
 	public EnergyStorage storage;
@@ -32,10 +33,10 @@ public class TileMachine extends TileEntity implements IEnergyHandler, IEnergyCo
 	
 	public void updateEntity(){
 		super.updateEntity();
-		addEnergy();
+		//addEnergy();
 	}
 	
-	public void addEnergy(){
+/*	public void addEnergy(){
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
 			TileEntity tile = this.worldObj.getTileEntity(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
 			
@@ -45,7 +46,7 @@ public class TileMachine extends TileEntity implements IEnergyHandler, IEnergyCo
 				storage.receiveEnergy(((IEnergyHandler)tile).extractEnergy(side.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), false), false);
 			}
 		}
-	}
+	}*/
 
 	@Override
 	public String getInventoryName() {
@@ -170,22 +171,17 @@ public class TileMachine extends TileEntity implements IEnergyHandler, IEnergyCo
 
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {		
-		return 0;
-	}
-
-	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {		
-		return 0;
+		return this.storage.receiveEnergy(maxReceive, simulate);
 	}
 
 	@Override
 	public int getEnergyStored(ForgeDirection from) {		
-		return storage.getEnergyStored();
+		return this.storage.getEnergyStored();
 	}
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {		
-		return storage.getMaxEnergyStored();
+		return this.storage.getMaxEnergyStored();
 	}
 	
 	public void readFromNBT(NBTTagCompound nbt){

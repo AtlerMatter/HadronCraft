@@ -11,8 +11,10 @@ public class HcTileEntity {
 	}
 	
 	public static void registerTileEntity(){
-		GameRegistry.registerTileEntity(TileCableCopper.class, RefStrings.MODID + "cableCopper");
+		GameRegistry.registerTileEntity(TileCable.class, RefStrings.MODID + TileCable.unlocalizedName);
+		GameRegistry.registerTileEntity(TileCableWIP.class, RefStrings.MODID + "tileCableWIP");
 		GameRegistry.registerTileEntity(TileGeneratorCombustion.class, RefStrings.MODID + "generatorCombustion");
 		GameRegistry.registerTileEntity(TileElectricSmelter.class, RefStrings.MODID + "electricSmelter");
+		GameRegistry.registerTileEntity(TileFissionReactor.class, RefStrings.MODID + "fissionReactor");
 	}
 }

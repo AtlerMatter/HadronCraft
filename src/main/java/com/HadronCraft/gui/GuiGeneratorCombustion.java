@@ -31,7 +31,7 @@ public class GuiGeneratorCombustion extends GuiContainer{
 		int fuel = this.entity.fuellevel;
 		
 		this.fontRendererObj.drawString(name, this.xSize / 2 - this.fontRendererObj.getStringWidth(name) / 2, 6, 4210752);
-		this.fontRendererObj.FONT_HEIGHT = 5;
+		this.fontRendererObj.FONT_HEIGHT = 1;
 		this.fontRendererObj.drawString("Energy: " + energy, 50, 26, 16777215);
 		this.fontRendererObj.drawString("Power: " + power, 50, 35, 16777215);
 		//this.fontRendererObj.drawString("Fuel: " + fuel, 50, 44, 16777215);
@@ -42,7 +42,7 @@ public class GuiGeneratorCombustion extends GuiContainer{
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(bground);
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		int k = this.entity.energy * 2 / 100;
+		int k = this.entity.energy / 100;
 		this.drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 74 - k, 177, 62 - k, 13, k);
 	}
 

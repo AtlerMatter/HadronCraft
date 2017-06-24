@@ -20,8 +20,10 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 	
 	public class MainRegistry {
 		
+		//GUI ID's
 		public static final int guiIdGeneratorCombustion = 0;
 		public static final int guiIdElectricSmelter = 1;
+		public static final int guiIdFissionReactor = 2;
 		
 
 	@SidedProxy(clientSide = RefStrings.CLIENTSIDE , serverSide = RefStrings.SERVERSIDE)

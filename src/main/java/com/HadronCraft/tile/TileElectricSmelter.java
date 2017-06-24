@@ -2,36 +2,51 @@ package com.HadronCraft.tile;
 
 import com.HadronCraft.block.BlockElectricSmelter;
 
+import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 	
-	public int smeltTime = 100;
+	public int requiredEnergy = 30; // RF per Tick
+	public int energyPerSmelting = 3000; //RF
+	public int smeltTime = 100; // Ticks
 	public int currentSmeltTime;
-	public int requiredEnergy;
-
+	int pausedSmeltingTicks;
+	
 	public TileElectricSmelter() {
 		super("Electric Smelter", 30000, 10000, 2);
 	}
 	
 	public void updateEntity(){
 		super.updateEntity();
-		
+
 		if (canSmelt()){
+			pausedSmeltingTicks = 0;
 			currentSmeltTime += 1;
 			storage.extractEnergy(requiredEnergy, false);
 			if (currentSmeltTime >= smeltTime){
 				currentSmeltTime = 0;
 				doSmelting();
 			}
+		}else if (currentSmeltTime > 0 && pausedSmeltingTicks >= 10){
+			currentSmeltTime -= 1;
 		}else {
-			currentSmeltTime = 0;
+			pausedSmeltingTicks += 1;
 		}
-		if (flag != flag1) {flag1 = flag; BlockElectricSmelter.updateBlockState(flag, worldObj, xCoord, yCoord, zCoord);}
+		
+		if (currentSmeltTime > 0){
+			BlockElectricSmelter.updateBlockState(true, worldObj, xCoord, yCoord, zCoord);
+		}else{
+			BlockElectricSmelter.updateBlockState(false, worldObj, xCoord, yCoord, zCoord);
+		}
 		markDirty();
 	}
 	
@@ -51,12 +66,36 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 	}
 	
 	public boolean canSmelt(){
-		if(storage.getEnergyStored() >= requiredEnergy && slots[0] != null && currentSmeltTime <= 0 && slots[1].stackSize < slots[1].getMaxStackSize()){
+		if (slots[0] == null) {
+			flag = false;
+			return false;
+		}
+		if (currentSmeltTime >= smeltTime) {
 			flag = true;
 			return true;
 		}
-		flag = false;
-		return false;
+		if (storage.getEnergyStored() < requiredEnergy) {
+			flag = false;
+			return false;
+		}
+
+		ItemStack itemstack = getOutput(slots[0]);
+		if (itemstack == null) {
+			flag = false;
+			return false;
+		}
+		if (slots[1] != null) {
+			if (!slots[1].isItemEqual(itemstack)) {
+				flag = false;
+				return false;
+			}
+			if (slots[1].stackSize + itemstack.stackSize > slots[1].getMaxStackSize()) {
+				flag = false;
+				return false;
+			}
+		}
+		flag = true;
+		return true;
 	}
 	
 	public ItemStack getOutput(ItemStack itemstack){
@@ -65,11 +104,22 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 	
 	public void readFromNBT(NBTTagCompound nbt){
 		super.readFromNBT(nbt);
+		
+		this.requiredEnergy = nbt.getInteger("requiredEnergy");
+		this.energyPerSmelting = nbt.getInteger("energyPerSmelting");
+		this.smeltTime = nbt.getInteger("smeltTime");
+		this.currentSmeltTime = nbt.getInteger("currentSmeltTime");
+		this.pausedSmeltingTicks = nbt.getInteger("pausedSmeltingTicks");
 	}
-	
 	
 	public void writeToNBT(NBTTagCompound nbt){
 		super.writeToNBT(nbt);
+		
+		nbt.setInteger("requiredEnergy", this.requiredEnergy);
+		nbt.setInteger("energyPerSmelting", this.energyPerSmelting);
+		nbt.setInteger("smeltTime", this.smeltTime);
+		nbt.setInteger("currentSmeltTime", this.currentSmeltTime);
+		nbt.setInteger("pausedSmeltingTicks", this.pausedSmeltingTicks);
 	}
 	
 	public boolean isItemValidForSlot(int slot, ItemStack stack){
@@ -77,26 +127,23 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 		else return true;
 	}
 	
+	
 	public boolean canConnectEnergy(ForgeDirection from) {
-		return true;
+		return from == ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
 	}
-		
-		public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+	
+	
+	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
 		return storage.receiveEnergy(maxReceive, simulate);
 	}
 		
 		
-		public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
-		return 0;
-	}
-		
-		
-		public int getEnergyStored(ForgeDirection from) {
+	public int getEnergyStored(ForgeDirection from) {
 		return storage.getEnergyStored();
 	}
 		
 		
-		public int getMaxEnergyStored(ForgeDirection from) {
+	public int getMaxEnergyStored(ForgeDirection from) {
 		return storage.getMaxEnergyStored();
 	}
 }

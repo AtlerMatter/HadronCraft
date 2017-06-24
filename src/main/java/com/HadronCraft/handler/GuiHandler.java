@@ -2,6 +2,7 @@ package com.HadronCraft.handler;
 
 import com.HadronCraft.container.ContainerElectricSmelter;
 import com.HadronCraft.container.ContainerGeneratorCombustion;
+import com.HadronCraft.gui.GuiElectricSmelter;
 import com.HadronCraft.gui.GuiGeneratorCombustion;
 import com.HadronCraft.tile.TileElectricSmelter;
 import com.HadronCraft.tile.TileGeneratorCombustion;
@@ -37,10 +38,10 @@ public class GuiHandler implements IGuiHandler {
 		case 0:
 				if (entity instanceof TileGeneratorCombustion) return new GuiGeneratorCombustion(player.inventory, (TileGeneratorCombustion) entity);
 				return null;		
-		/*case 1:
-				if (entity instanceof TileElectricSmelter) return new GuiElectricGenerator(player.inventory, (TileElectricSmelter) entity);
+		case 1:
+				if (entity instanceof TileElectricSmelter) return new GuiElectricSmelter(player.inventory, (TileElectricSmelter) entity);
 				return null;
-		*/}
+		}
 		return null;
 	}
 }

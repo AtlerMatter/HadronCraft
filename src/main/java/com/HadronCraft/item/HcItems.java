@@ -61,6 +61,9 @@ public class HcItems {
 	public static Item batteryAdvanced;
 	public static Item batteryElite;
 	public static Item batteryUltimate;
+	//Nuclear Stuff
+	public static Item containmentCell;
+	public static Item universalTestingFuel;
 	
 	public static void initializeItem(){
 		ingotCopper = new Item().setUnlocalizedName("ingotCopper").setCreativeTab(HcTabs.tabHC).setTextureName("hadroncraft:ingotCopper");
@@ -90,10 +93,12 @@ public class HcItems {
 		bronzeShovel = new BronzeShovel(Bronze).setUnlocalizedName("bronzeShovel").setCreativeTab(HcTabs.tabHC);
 		bronzeSword = new BronzeSword(Bronze).setUnlocalizedName("bronzeSword").setCreativeTab(HcTabs.tabHC);
 		bronzeHoe = new BronzeHoe(Bronze).setUnlocalizedName("bronzeHoe").setCreativeTab(HcTabs.tabHC);
-		batteryBasic = new Battery(200000, 20000).setUnlocalizedName("batteryBasic").setCreativeTab(HcTabs.tabHC);
-		batteryAdvanced = new Battery(800000, 80000).setUnlocalizedName("batteryAdvanced").setCreativeTab(HcTabs.tabHC);
-		batteryElite = new Battery(2000000, 200000).setUnlocalizedName("batteryElite").setCreativeTab(HcTabs.tabHC);
-		batteryUltimate = new Battery(2000000, 200000).setUnlocalizedName("batteryUltimate").setCreativeTab(HcTabs.tabHC);
+		batteryBasic = new ItemBattery(200000, 20000).setUnlocalizedName("batteryBasic").setCreativeTab(HcTabs.tabHC);
+		batteryAdvanced = new ItemBattery(800000, 80000).setUnlocalizedName("batteryAdvanced").setCreativeTab(HcTabs.tabHC);
+		batteryElite = new ItemBattery(2000000, 200000).setUnlocalizedName("batteryElite").setCreativeTab(HcTabs.tabHC);
+		batteryUltimate = new ItemBattery(2000000, 200000).setUnlocalizedName("batteryUltimate").setCreativeTab(HcTabs.tabHC);
+		containmentCell = new ItemContainmentCell().setUnlocalizedName("containmentCell").setCreativeTab(HcTabs.tabHC);
+		universalTestingFuel = new Item().setUnlocalizedName("universalTestingFuel").setCreativeTab(HcTabs.tabHC);
 	}
 	
 	public static void registerItem(){

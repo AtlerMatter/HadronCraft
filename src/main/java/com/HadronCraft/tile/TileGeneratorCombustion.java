@@ -27,15 +27,15 @@ public class TileGeneratorCombustion extends TileGenerator {
 	public int fuellevel;
 	public int fuelMax = 1000000; //Talvez mudar para dar balance
 	public int requiredFuel = 100; //Talvez mudar
-	public int power = 30; //Mudar se mudar o RequiredFuel
+	public int power = 15; //Mudar se mudar o RequiredFuel
 	//Com estas stats queima durante 8.3min se estiver full. Para meter full é preciso 25 carvão
-	//cada smelting custa 3000 RF
-	// em 8.3min gera 300000 RF, que dá para 100 Smeltings. (3/4 de batteryBox?)
+	//cada smelting custa 3000 RF (ou com mekanism 3000 RF)
+	// em 8.3min gera 150000 RF, que dá para 50 Smeltings. (3/4 de batteryBox?)
 	
-	//Generates 30 RF/t
+	//Generates 15 RF/t
 	
 	public TileGeneratorCombustion() {
-		super("Combustion Generator", 3000, 100, 2);
+		super("combustionGenerator", 6000, 500, 2);
 	}
 	
 	
@@ -43,7 +43,6 @@ public class TileGeneratorCombustion extends TileGenerator {
 		super.updateEntity();
 		energy();
 		fuel();
-		addEnergy();
 		if (flag != flag1) {flag1 = flag; BlockGeneratorCombustion.updateBlockState(flag, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 		}
 		markDirty();
@@ -138,5 +137,11 @@ public class TileGeneratorCombustion extends TileGenerator {
 	public boolean isItemValidForSlot(int slot, ItemStack stack){
 		if (slot == 0) return isFuel(stack);
 		else return true;
+	}
+
+
+	@Override
+	public int getInventoryStackLimit() {
+		return 64;
 	}
 }

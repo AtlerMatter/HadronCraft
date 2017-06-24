@@ -1,149 +1,170 @@
 package com.HadronCraft.tile;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-/*
- * Used just to group every cable type under one type of class
- */
-
-public class TileCable extends TileEntity implements IEnergyHandler, IEnergyProvider, IEnergyReceiver{
+public class TileCable extends TileEntity implements IEnergyHandler{
 	
-	/*WIP*/protected EnergyStorage storage = new EnergyStorage(20000);
+	/*WIP*/public EnergyStorage storage;
+	public static String unlocalizedName;
 	/*WIP*/public int energy;
 	/*WIP*/protected double Voltage = 120; //Volts
 	/*WIP*/protected double Resistance = 0.5; // Ohms
 	/*WIP*/protected double Intensity = energy / Voltage; // Amperes
 	/*WIP*/public final int lossConstant = 1200; //Constante de perda usada nas equações de perda para dar o resultado pretendido
-	/*WIP*/double powerLoss = storage.getMaxEnergyStored() * (((lossConstant / Voltage) + (Resistance / lossConstant)) / 100);
-	protected TileCable Master;
-	private boolean isMaster;
-	private boolean firstRun = true;
+	/*WIP*/double powerLoss;
+	public TileCable Master;
+	public ArrayList<TileCable> Slaves = new ArrayList<TileCable>();
 	
-	/*WIP*/public TileCable(double MaxPower ,double Voltage, double Resistance){
-		this.storage.setCapacity((int) MaxPower);
-		this.storage.setMaxTransfer((int) MaxPower);
-		this.Voltage = Voltage;
-		this.Resistance = Resistance;
-	}
-	
-	/*
-	 * Things that were added before.
-	 * (Thing from the legacy generic cable that was just a placeholder)
-	 */
-	public boolean hasMaster(){
-		return this.Master != null;
-	}
-	
-	public boolean isMaster(){
-		return isMaster;
-	}
-	
-	public TileCable getMaster(){
-		return this.Master;
-	}
-	
-	public void setMaster(TileCable Master){
-		this.Master = Master;
-	}
 	
 	public void updateEntity(){
-		super.updateEntity();
-		if(firstRun){
-			this.createMultiblock();
-			this.firstRun = false;
+		super.updateEntity();	
+		if (this.Master == null){
+			adjacentNetworksCheck();
 		}
-		//energyReceive();
-		energySend();
-	}
-	
-	private void createMultiblock(){
-        if(Master == null || Master.isInvalid()) {
-            List<TileCable> connectedNetwork = new ArrayList<TileCable>();
-            Stack<TileCable> directNear = new Stack<TileCable>();
-            TileCable master = this;
-            directNear.add(this);
-            while(!directNear.isEmpty()) {
-            	TileCable storage = directNear.pop();
-                if(storage.isMaster()) {
-                    master = storage;
-                }
-                connectedNetwork.add(storage);
-                for(ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
-                    TileEntity tile = worldObj.getTileEntity(storage.xCoord + side.offsetX, storage.yCoord + side.offsetY, storage.zCoord + side.offsetZ);
-                    if(tile instanceof TileCable && !connectedNetwork.contains(tile)) {
-                    	directNear.add((TileCable)tile);
-                    }
-                }
-            }
-            System.out.println("Setting master to " + master.xCoord + ", " + master.yCoord + ", " + master.zCoord + " for " + connectedNetwork.size() + " blocks");
-            for(TileCable cable : connectedNetwork) {
-            	cable.setMaster(master);
-            }
-        }
-    }
-
-	public void invalidate(){
-		super.invalidate();
-		for(ForgeDirection side : ForgeDirection.VALID_DIRECTIONS){
-			TileEntity tile = worldObj.getTileEntity(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
-			if(tile instanceof TileCable){
-				((TileCable) tile).Master = null;
-				((TileCable) tile).createMultiblock();
-			}
+		
+		if (this.Master != null){
+			energySend();
 		}
 	}
 	
-	/*
-	 * 
-	 * Stuff added after
-	 * (Stuff that used to be implemented in the CableCopper, now to be used in every cable type)
-	 * 
-	 */
-			
+	public enum CableTypes{
+		Copper,
+		Tin,
+		Silver,
+		Gold,
+		Superconductor;
+	}
+	
+	public TileCable (CableTypes Type){
+		switch(Type){
+		case Copper:
+			setProperties("CableCopper", 140000, 120, 0.5);
+			break;
+		case Tin:
+			setProperties("CableTin", 140000, 120, 0.4);
+			break;
+		case Silver:
+			setProperties("CableSilver", 140000, 120, 0.25);
+			break;
+		case Gold:
+			setProperties("CableGold", 140000, 120, 0.1);
+			break;
+		case Superconductor:
+			setProperties("CableSuperconductor", 140000, 120, 0.0);
+			break;
+		}
+	}
+	
+	/*WIP*/private void setProperties(String Name, int MaxPower, int Voltage, double Resistance){
+		this.unlocalizedName = Name;
+		this.Voltage = Voltage;
+		this.Resistance = Resistance;
+		this.storage = new EnergyStorage(MaxPower);
+		this.powerLoss = storage.getMaxEnergyStored() * (((lossConstant / Voltage) + (Resistance / lossConstant)) / 100);
+	}
+	
+	//FIXME Fix this, ain't passing energy from energy cube to energy cube
 	public void energySend(){
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS){
-			TileEntity tile = this.worldObj.getTileEntity(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
+			TileEntity tile = this.worldObj.getTileEntity(this.xCoord + side.offsetX, this.zCoord + side.offsetY, this.zCoord + side.offsetZ);
 			
-			if (tile instanceof IEnergyHandler){
-				Master.storage.extractEnergy(((IEnergyHandler) tile).receiveEnergy(side.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), false), false);
-			}
-			if (tile instanceof IEnergyReceiver){
-				Master.storage.extractEnergy(((IEnergyReceiver) tile).receiveEnergy(side.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), false), false);
-			}
-			if (tile instanceof TileCableCopper){
-				Master.storage.extractEnergy(((IEnergyReceiver) tile).receiveEnergy(side.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), false), false);
+			if ((tile instanceof IEnergyReceiver) && (!tile.getClass().equals(TileCable.class))){
+				this.Master.storage.extractEnergy(((IEnergyReceiver) tile).receiveEnergy(side.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), false), false);
+			}else if ((tile instanceof IEnergyHandler) && (!tile.getClass().equals(TileCable.class))){
+				this.Master.storage.extractEnergy(((IEnergyHandler) tile).receiveEnergy(side.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), false), false);
 			}
 		}
 	}
 	
-	/*public void energyReceive(){
+	//TODO [Should be fixed] Fix this. Infinite loop on joining two networks.
+	public void adjacentNetworksCheck(){
+		System.out.println("Performing adjacentNetworksCheck");
+		
+		//This is used to check if there are two different networks when placing this block
+		ArrayList<TileCable> adjacentNetworks = new ArrayList<TileCable>();
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS){
-			TileEntity tile = this.worldObj.getTileEntity(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
+			TileEntity te = this.worldObj.getTileEntity(this.xCoord + side.offsetX, this.yCoord + side.offsetY, this.zCoord + side.offsetZ);
 			
-			if (tile instanceof IEnergyHandler){
-				storage.receiveEnergy(((IEnergyHandler) tile).extractEnergy(side.getOpposite(), storage.receiveEnergy(storage.getMaxExtract(), true), false), false);
-
-			}
-			if (tile instanceof IEnergyProvider){
-				storage.receiveEnergy(((IEnergyProvider) tile).extractEnergy(side.getOpposite(), storage.receiveEnergy(storage.getMaxExtract(), true), false), false);
-
+			if ((te instanceof TileCable) && (((TileCable) te).Master != null)){
+				TileCable adjMaster = ((TileCable)te).Master;
+				if (!adjacentNetworks.contains(adjMaster)){
+					adjacentNetworks.add(adjMaster);
+				}
 			}
 		}
-	}*/
+		if (adjacentNetworks.size() > 1){
+			for (TileCable tile : adjacentNetworks){
+				tile.Master = this;
+				for (TileCable slave : tile.Slaves){
+					slave.Master = this;
+				}
+				tile.Slaves.clear();
+			}
+			System.out.println("More than one network detected");
+		}
+		cableNetworkInitialization();
+	}
+	
+	public void cableNetworkInitialization(){
+		System.out.println("Performing cableNetworkInitialization");
+
+		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS){
+			TileEntity tile = this.worldObj.getTileEntity(this.xCoord + side.offsetX, this.yCoord + side.offsetY, this.zCoord + side.offsetZ);
+			
+			if ((tile instanceof TileCable) && (((TileCable)tile).Master != null) && (this.Master == null)){
+				TileCable newMaster = ((TileCable)tile).Master;
+				this.Master = newMaster;
+				newMaster.Slaves.add(this);
+				System.out.println("Setting Master to:" + this.Master.xCoord + "," + this.Master.yCoord + "," + this.Master.zCoord);
+				break;
+			}
+		}
+		if (this.Master == null){
+			this.Master = this;
+			System.out.println("Setting THIS as a master");
+		}
+	}
+	
+	//FIXME not making new networks after splitting one
+	@Override
+	public void invalidate(){
+		super.invalidate();
+		System.out.println("Performing invalidate");
+
+		if (this.Master == this){
+			System.out.println("This is a Master, so, Clearing Slave's Master");
+			for(TileCable slave : this.Slaves){
+				slave.Master = null;
+				//Every cable will have no master, so they will reinitialize and start looking for one
+			}
+		}else{
+			//This will be removed from the master's slave list, and if he is connected to more than one cable, the whole network must be reinitialized
+			int connectedCables = 0;
+			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS){
+				TileEntity tile = this.worldObj.getTileEntity(this.xCoord + side.offsetX, this.yCoord + side.offsetY, this.zCoord + side.offsetZ);
+				
+				if (tile instanceof TileCable){
+					connectedCables++;
+				}
+			}
+			System.out.println("Invalidating: Number of adjacent cables: " + connectedCables);
+			if (connectedCables > 1){
+				System.out.println("Clearing my master's slaves's Master as part of invalidation");
+				this.Master.Master = null;
+				for (TileCable slave : this.Master.Slaves){
+					slave.Master = null;
+				}
+				this.Master.Slaves.clear();
+			}
+		}
+	}
 	
 	@Override
 	public boolean canConnectEnergy(ForgeDirection from) {
@@ -152,51 +173,30 @@ public class TileCable extends TileEntity implements IEnergyHandler, IEnergyProv
 
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
-		return Master.storage.receiveEnergy(maxReceive, false);
+		if (this.Master != null){
+			return this.Master.storage.receiveEnergy(maxReceive, simulate);
+		}else return 0;
 	}
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
-		return Master.storage.extractEnergy(maxExtract, false);
+		if (this.Master != null){
+			return this.Master.storage.extractEnergy(maxExtract, simulate);
+		}else return 0;
 	}
 
 	@Override
 	public int getEnergyStored(ForgeDirection from) {
-		return Master.storage.getEnergyStored();
+		if (this.Master != null){
+			return this.Master.storage.getEnergyStored();
+		}else return 0;
 	}
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
-		return Master.storage.getMaxEnergyStored();
+		if (this.Master != null){
+			return this.Master.storage.getMaxEnergyStored();
+		}else return 0;
 	}
-	
-	public Packet getDescriptionPacket(){
-		NBTTagCompound nbtTag = new NBTTagCompound();
-		nbtTag.setInteger("Energy", this.storage.getEnergyStored());
-		this.energy = nbtTag.getInteger("Energy");
-		this.writeToNBT(nbtTag);
-		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbtTag);
-	}
-	
-	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet){
-		super.onDataPacket(net, packet);
-		this.readFromNBT(packet.func_148857_g());
-	}
-	
-	public void readFromNBT(NBTTagCompound nbt){
-		super.readFromNBT(nbt);
-		
-		if (nbt.hasKey("storage")){
-			this.storage.readFromNBT(nbt.getCompoundTag("storage"));
-		}
-	}
-	
-	public void writeToNBT(NBTTagCompound nbt){
-		super.writeToNBT(nbt);
-		
-		NBTTagCompound energyTag = new NBTTagCompound();
-		this.storage.writeToNBT(energyTag);
-		nbt.setTag("storage", energyTag);
-	}
-	
+
 }

@@ -23,11 +23,14 @@ public class HcBlocks {
 	//Nuclear Stuff's Ores
 	public static Block oreUranium;
 	public static Block orePlutonium;
-	//Machines
-		//Generators
+	//Machine Stuffs
+		//Energy Transmitters
 	public static Block cableCopper;
+		//Generators
 	public static Block generatorCombustionIdle;
 	public static Block generatorCombustionActive;
+	public static Block fissionReactorIdle;
+	public static Block fissionReactorActive;
 		//Energy Users
 	public static Block electricSmelterIdle;
 	public static Block electricSmelterActive;
@@ -44,6 +47,8 @@ public class HcBlocks {
 		generatorCombustionIdle = new BlockGeneratorCombustion(false).setBlockName("generatorCombustionIdle").setCreativeTab(HcTabs.tabHC);
 		electricSmelterActive = new BlockElectricSmelter(true).setBlockName("electricSmelterActive").setCreativeTab(HcTabs.tabHC).setLightLevel(0.5F);
 		electricSmelterIdle = new BlockElectricSmelter(false).setBlockName("electricSmelterIdle").setCreativeTab(HcTabs.tabHC);
+		fissionReactorIdle = new BlockFissionReactor(false).setBlockName("fissionReactorIdle").setCreativeTab(HcTabs.tabHC);
+		
 	}
 	
 	public static void registerBlock(){
@@ -57,6 +62,7 @@ public class HcBlocks {
 		GameRegistry.registerBlock(generatorCombustionIdle, generatorCombustionIdle.getUnlocalizedName());
 		GameRegistry.registerBlock(electricSmelterActive, electricSmelterActive.getUnlocalizedName());
 		GameRegistry.registerBlock(electricSmelterIdle, electricSmelterIdle.getUnlocalizedName());
+		GameRegistry.registerBlock(fissionReactorIdle, fissionReactorIdle.getUnlocalizedName());
 	}
 	
 	

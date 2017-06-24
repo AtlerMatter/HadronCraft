@@ -3,6 +3,7 @@ package com.HadronCraft.tile;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -15,7 +16,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class TileGenerator extends TileEntity implements IEnergyHandler, IEnergyConnection, IInventory{
+public abstract class TileGenerator extends TileEntity implements IEnergyProvider, IInventory{
 	public boolean flag;
 	public boolean flag1 = false;
 	public EnergyStorage storage;
@@ -30,7 +31,11 @@ public abstract class TileGenerator extends TileEntity implements IEnergyHandler
 		slots = new ItemStack[slotsNumber];
 	}
 	
-	public void addEnergy(){
+	public void updateEntity(){
+		sendEnergy();
+	}
+	
+	public void sendEnergy(){
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
 			TileEntity tile = this.worldObj.getTileEntity(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
 			
@@ -126,11 +131,6 @@ public abstract class TileGenerator extends TileEntity implements IEnergyHandler
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
 	public boolean isUseableByPlayer(EntityPlayer p_70300_1_) {
 		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this;
 	}
@@ -144,11 +144,6 @@ public abstract class TileGenerator extends TileEntity implements IEnergyHandler
 	public void closeInventory() {
 		
 	}
-
-	@Override
-	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		return true;
-	}	
 	
 	public Packet getDescriptionPacket(){
 		NBTTagCompound nbtTag = new NBTTagCompound();
@@ -165,17 +160,12 @@ public abstract class TileGenerator extends TileEntity implements IEnergyHandler
 
 	@Override
 	public boolean canConnectEnergy(ForgeDirection from) {
-		return from == ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
-	}
-
-	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
-		return 0;
+		return true;
 	}
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
-		return 0;
+		return this.storage.extractEnergy(maxExtract, simulate);
 	}
 
 	@Override

@@ -14,13 +14,14 @@ public class ContainerElectricSmelter extends Container{
 	
 	private TileElectricSmelter entity;
 	public int lastEnergy;
+	public int lastCurrentSmeltTime;
 	public int lastSmeltTime;
 	public int lastCycledTicks;
 	
 	public ContainerElectricSmelter (InventoryPlayer playerInv, TileElectricSmelter entity) {
 		this.entity = entity;
-		this.addSlotToContainer(new Slot(entity, 0, 50, 50));
-		this.addSlotToContainer(new Slot(entity, 0, 70, 50));
+		this.addSlotToContainer(new Slot(entity, 0, 56, 35));
+		this.addSlotToContainer(new Slot(entity, 1, 116, 35));
 		
 		for (int i = 0; i < 3; ++i)
         {
@@ -38,8 +39,9 @@ public class ContainerElectricSmelter extends Container{
 	
 	public void addCraftingToCrafters(ICrafting icrafting){
 		super.addCraftingToCrafters(icrafting);
-       		icrafting.sendProgressBarUpdate(this, 0, this.entity.smeltTime);
-       		icrafting.sendProgressBarUpdate(this, 1, this.entity.currentSmeltTime);
+		icrafting.sendProgressBarUpdate(this, 0, this.entity.energy);
+       	icrafting.sendProgressBarUpdate(this, 1, this.entity.smeltTime);
+       	icrafting.sendProgressBarUpdate(this, 2, this.entity.currentSmeltTime);
 	}
 	
 	public void detectAndSendChanges(){
@@ -61,11 +63,12 @@ public class ContainerElectricSmelter extends Container{
 	public void updateProgressBar(int slot, int value){
 		super.updateProgressBar(slot, value);
 		if (slot == 1){this.lastEnergy = this.upcastShort(value);}
-		if (slot == 2){this.lastSmeltTime = this.upcastShort(value);}
-		// TODO if (slot == 3){this.
+		if (slot == 2){this.lastCurrentSmeltTime = this.upcastShort(value);}
+		if (slot == 3){this.lastSmeltTime = this.upcastShort(value);}
 		
-		if (slot == 3){this.entity.energy = this.lastEnergy | value << 16;}
-		if (slot == 4){this.entity.smeltTime = this.lastSmeltTime | value << 16;}
+		if (slot == 4){this.entity.energy = this.lastEnergy | value << 16;}
+		if (slot == 5){this.entity.currentSmeltTime = this.lastCurrentSmeltTime | value << 16;}
+		if (slot == 6){this.entity.smeltTime = this.lastSmeltTime | value << 16;}
 	}
 
 	
