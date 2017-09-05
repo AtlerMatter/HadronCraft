@@ -24,14 +24,12 @@ public class BlockCableCopper extends BlockCable{
 		this.opaque = false;
 	}
 	
-	/*@Override
+	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block){
-		TileEntity tile = world.getTileEntity(x, y, z);
+		super.onNeighborBlockChange(world, x, y, z, block);
 		
-		if(block instanceof IEnergyProvider || block instanceof  IEnergyHandler || block instanceof IEnergyReceiver){
-			((TileCable) tile).checkConnectedMachines();
-		}
-	}*/
+		world.getTileEntity(x, y, z).updateEntity();
+	}
 	
 	@Override
 	public TileEntity createNewTileEntity(World world, int i) {

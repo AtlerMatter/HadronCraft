@@ -13,10 +13,10 @@ import net.minecraft.item.ItemStack;
 public class ContainerElectricSmelter extends Container{
 	
 	private TileElectricSmelter entity;
-	public int lastEnergy;
-	public int lastCurrentSmeltTime;
-	public int lastSmeltTime;
-	public int lastCycledTicks;
+	private int lastEnergy;
+	private int lastCurrentSmeltTime;
+	private int lastSmeltTime;
+	private int lastCycledTicks;
 	
 	public ContainerElectricSmelter (InventoryPlayer playerInv, TileElectricSmelter entity) {
 		this.entity = entity;
@@ -37,6 +37,7 @@ public class ContainerElectricSmelter extends Container{
         }
 	}
 	
+	@Override
 	public void addCraftingToCrafters(ICrafting icrafting){
 		super.addCraftingToCrafters(icrafting);
 		icrafting.sendProgressBarUpdate(this, 0, this.entity.energy);
@@ -44,6 +45,7 @@ public class ContainerElectricSmelter extends Container{
        	icrafting.sendProgressBarUpdate(this, 2, this.entity.currentSmeltTime);
 	}
 	
+	@Override
 	public void detectAndSendChanges(){
 		super.detectAndSendChanges();
 		
@@ -60,6 +62,7 @@ public class ContainerElectricSmelter extends Container{
 		}
 	}
 		
+	@Override
 	public void updateProgressBar(int slot, int value){
 		super.updateProgressBar(slot, value);
 		if (slot == 1){this.lastEnergy = this.upcastShort(value);}
@@ -72,6 +75,7 @@ public class ContainerElectricSmelter extends Container{
 	}
 
 	
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int clickedSlotNumber){
 		ItemStack itemstack = null;
 		Slot slot =(Slot)this.inventorySlots.get(clickedSlotNumber);

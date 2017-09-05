@@ -133,6 +133,8 @@ public class HcItems {
 		GameRegistry.registerItem(batteryAdvanced, batteryAdvanced.getUnlocalizedName());
 		GameRegistry.registerItem(batteryElite, batteryElite.getUnlocalizedName());
 		GameRegistry.registerItem(batteryUltimate, batteryUltimate.getUnlocalizedName());
+		GameRegistry.registerItem(containmentCell, containmentCell.getUnlocalizedName());
+		GameRegistry.registerItem(universalTestingFuel, universalTestingFuel.getUnlocalizedName());
 	}
 	
 	public static void registerOreItem(){

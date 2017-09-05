@@ -24,6 +24,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * This is the class that contains every cable type, which is changed based on the arguments of the tileCable constructor
+ * NOTE: The Cables do not work, and i am forgetting them for now, while i work on other stuff, which i can "easily" get working.
  * @author LukeDC
  */
 

@@ -1,9 +1,7 @@
 package com.HadronCraft.tile;
 
-import org.apache.http.impl.conn.tsccm.WaitingThreadAborter;
-
 import com.HadronCraft.item.HcItems;
-
+import com.HadronCraft.item.ItemContainmentCell;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -18,16 +16,18 @@ public class TileFissionReactor extends TileGenerator{
 	int moderateHeat = 80;
 	int maxHeat = 100;
 	int meltDownHeat = 110;
-	int currentRadOutput;
+	int currentRadOutput = 0;
 	int fissionTickRate = 1;
-	int fissionCompleteTicks = 12000; /* Normally 10 mins */
-	
+	int fissionCompleteTicks = 10000; // Normally 8.20 mins [Deprecated]
+
 	/*
 	 * Each cell of Uranium-235 generates 3000000X more energy than a piece of coal. So each U-235 generates 18000000000 RF
 	 */
 	
 	public TileFissionReactor() {
 		super("fissionReactor", 1800000000, 180000000, 3);
+		// Slots: 0-Fuel Input; 1-Product Output; 2-Batteries or upgrades or something
+		// like that
 
 	}
 	
@@ -40,6 +40,7 @@ public class TileFissionReactor extends TileGenerator{
 	
 	
 	void checkStructure(){
+		//TODO Finish the structure
 		int waterFound = 0;
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS){
 			Block block = worldObj.getBlock(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
@@ -47,6 +48,10 @@ public class TileFissionReactor extends TileGenerator{
 			if (block.getMaterial() == Material.water){
 				waterFound++;
 			}
+		}
+		// Change the number and do somthing when true
+		if (waterFound == 10) {
+
 		}
 	}
 	
@@ -59,10 +64,11 @@ public class TileFissionReactor extends TileGenerator{
 	}
 	
 	boolean canGeneratePower(){
-		return this.slots[0] != null && isFissionFuel(this.slots[0]);
+		return this.slots[0] != null && isFissionFuel(this.slots[0]) && (this.storage.getEnergyStored()
+				+ this.getFissionFuelPower(slots[0]) <= this.storage.getMaxEnergyStored());
 	}
 	
-	void addFuel(){
+	/*void addFuel(){
 		ItemStack stack = this.getStackInSlot(0);
 		
 		if (stack != null && isFissionFuel(stack)){
@@ -72,17 +78,40 @@ public class TileFissionReactor extends TileGenerator{
 				this.slots[0] = null;
 			}
 		}
-	}
+	}*/
 	
+	// TODO Come up with numbers for plutonium fisson and for U-233 fission
 	int getFissionFuelPower(ItemStack stack){
 		Item item = stack.getItem();
-		if (item == HcItems.universalTestingFuel){
+		
+		if(item == HcItems.containmentCell && ((ItemContainmentCell)item).getStorageType(stack) == "U-235"){
 			return 1500000;
-		}else return 0;
+		} else if (item == HcItems.containmentCell && ((ItemContainmentCell) item).getStorageType(stack) == "U-233") {
+			return 0;
+		} else if (item == HcItems.containmentCell && ((ItemContainmentCell) item).getStorageType(stack) == "Pu-239") {
+			return 0;
+		} else if (item == HcItems.universalTestingFuel) {
+			return 1500000;
+		} else return 0;
+	}
+	
+	// TODO Come up with numbers for plutonium fisson and for U-233 fission
+	int getFissionFuelTime(ItemStack stack) {
+		Item item = stack.getItem();
+		
+		if (item == HcItems.containmentCell && ((ItemContainmentCell) item).getStorageType(stack) == "U-235") {
+			return 10000;
+		} else if (item == HcItems.containmentCell && ((ItemContainmentCell) item).getStorageType(stack) == "U-233") {
+			return 0;
+		} else if (item == HcItems.containmentCell && ((ItemContainmentCell) item).getStorageType(stack) == "Pu-239") {
+			return 0;
+		} else if (item == HcItems.universalTestingFuel) {
+			return 10000;
+		} else return 0;
 	}
 	
 	boolean isFissionFuel(ItemStack stack){
-		return stack != null && getFissionFuelPower(stack) > 0;
+		return stack != null && getFissionFuelPower(stack) > 0 && getFissionFuelTime(stack) > 0;
 	}
 	
 

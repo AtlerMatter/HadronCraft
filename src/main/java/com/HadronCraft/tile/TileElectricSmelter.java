@@ -25,6 +25,7 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 		super("Electric Smelter", 30000, 10000, 2);
 	}
 	
+	@Override
 	public void updateEntity(){
 		super.updateEntity();
 
@@ -42,7 +43,7 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 			pausedSmeltingTicks += 1;
 		}
 		
-		if (currentSmeltTime > 0){
+		if (currentSmeltTime > 0 || canSmelt()) {
 			BlockElectricSmelter.updateBlockState(true, worldObj, xCoord, yCoord, zCoord);
 		}else{
 			BlockElectricSmelter.updateBlockState(false, worldObj, xCoord, yCoord, zCoord);
@@ -102,6 +103,7 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 		return FurnaceRecipes.smelting().getSmeltingResult(itemstack);
 	}
 	
+	@Override
 	public void readFromNBT(NBTTagCompound nbt){
 		super.readFromNBT(nbt);
 		
@@ -112,6 +114,7 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 		this.pausedSmeltingTicks = nbt.getInteger("pausedSmeltingTicks");
 	}
 	
+	@Override
 	public void writeToNBT(NBTTagCompound nbt){
 		super.writeToNBT(nbt);
 		
@@ -122,27 +125,32 @@ public class TileElectricSmelter extends TileMachine implements IEnergyReceiver{
 		nbt.setInteger("pausedSmeltingTicks", this.pausedSmeltingTicks);
 	}
 	
+	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack){
 		if (slot == 1) return false;
 		else return true;
 	}
 	
 	
+	@Override
 	public boolean canConnectEnergy(ForgeDirection from) {
 		return from == ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
 	}
 	
 	
+	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
 		return storage.receiveEnergy(maxReceive, simulate);
 	}
 		
 		
+	@Override
 	public int getEnergyStored(ForgeDirection from) {
 		return storage.getEnergyStored();
 	}
 		
 		
+	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
 		return storage.getMaxEnergyStored();
 	}

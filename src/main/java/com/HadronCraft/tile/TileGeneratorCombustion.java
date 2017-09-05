@@ -18,6 +18,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -39,6 +42,7 @@ public class TileGeneratorCombustion extends TileGenerator {
 	}
 	
 	
+	@Override
 	public void updateEntity(){
 		super.updateEntity();
 		energy();
@@ -111,6 +115,7 @@ public class TileGeneratorCombustion extends TileGenerator {
 	}
 	
 	
+	@Override
 	public void readFromNBT(NBTTagCompound nbt){
 		super.readFromNBT(nbt);
 		
@@ -123,6 +128,7 @@ public class TileGeneratorCombustion extends TileGenerator {
 	}
 	
 	
+	@Override
 	public void writeToNBT(NBTTagCompound nbt){
 		super.writeToNBT(nbt);
 		
@@ -134,6 +140,7 @@ public class TileGeneratorCombustion extends TileGenerator {
 		nbt.setInteger("lE", this.lastE);
 	}
 	
+	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack){
 		if (slot == 0) return isFuel(stack);
 		else return true;

@@ -43,10 +43,11 @@ public class HcBlocks {
 		oreUranium = new OreUranium(Material.rock).setBlockName("oreUranium").setCreativeTab(HcTabs.tabHC).setBlockTextureName("hadroncraft:oreUranium");
 		orePlutonium = new OrePlutonium(Material.rock).setBlockName("orePlutonium").setCreativeTab(HcTabs.tabHC).setBlockTextureName("hadroncraft:orePlutonium");
 		cableCopper = new BlockCableCopper(Material.ground).setBlockName("cableCopper").setCreativeTab(HcTabs.tabHC);
-		generatorCombustionActive = new BlockGeneratorCombustion(true).setBlockName("generatorCombustionActive").setCreativeTab(HcTabs.tabHC).setLightLevel(0.4F);
+		generatorCombustionActive = new BlockGeneratorCombustion(true).setBlockName("generatorCombustionActive").setLightLevel(0.4F);
 		generatorCombustionIdle = new BlockGeneratorCombustion(false).setBlockName("generatorCombustionIdle").setCreativeTab(HcTabs.tabHC);
-		electricSmelterActive = new BlockElectricSmelter(true).setBlockName("electricSmelterActive").setCreativeTab(HcTabs.tabHC).setLightLevel(0.5F);
+		electricSmelterActive = new BlockElectricSmelter(true).setBlockName("electricSmelterActive").setLightLevel(0.5F);
 		electricSmelterIdle = new BlockElectricSmelter(false).setBlockName("electricSmelterIdle").setCreativeTab(HcTabs.tabHC);
+		fissionReactorActive = new BlockFissionReactor(true).setBlockName("fissionReactorActive").setLightLevel(0.6F);
 		fissionReactorIdle = new BlockFissionReactor(false).setBlockName("fissionReactorIdle").setCreativeTab(HcTabs.tabHC);
 		
 	}
